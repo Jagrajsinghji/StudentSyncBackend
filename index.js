@@ -3,6 +3,9 @@ const mongoose = require('mongoose');
 require('dotenv').config()
 
 const userRoutes = require('./routes/userRoutes');
+const institutionRoutes = require('./routes/institutionRoutes');
+const skillsRoutes = require('./routes/skillRoutes');
+const emailRoutes = require('./routes/emailRoutes');
 
 const app = express();
 
@@ -12,6 +15,9 @@ const port = process.env.PORT || 8081;
 app.use(express.json());
 
 app.use(userRoutes);
+app.use(institutionRoutes);
+app.use(skillsRoutes);
+app.use(emailRoutes);
 
 app.get('/', function (req, res) {
     res.send('This is StudentSync backend');
