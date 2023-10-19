@@ -40,3 +40,27 @@ exports.createUser = async (req, res) => {
     res.status(400).send(error);
   }
 };
+
+
+// PATCH /users/:id
+exports.updateUser = async (req, res) => {
+  const updates = Object.keys(req.body);
+  const allowedUpdates = ['name', 'email', 'password', 'user_status'];
+  const isValidOperation = updates.every(update => allowedUpdates.includes(update));
+  if (!isValidOperation) {
+    return res.status(400).send({ error: 'Invalid updates!' });
+  }
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).send('Username not found');
+    }
+    updates.forEach(update => user[update] = req.body[update]);
+    updates.forEach(update => console.log(update.name));
+    console.log(user);
+    await user.save();
+    res.send(user);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+};

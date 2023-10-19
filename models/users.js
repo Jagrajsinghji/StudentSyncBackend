@@ -6,9 +6,7 @@ const userSchema = new Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    user_status: { type: String, enum: ["active", "pending", "inactive"], required: true },
-    created_dateTime: { type: Date},
-    updated_dateTime: { type: Date }
+    user_status: { type: String, enum: ["active", "pending", "inactive"], required: true }
   }, { timestamps: true });
   
 

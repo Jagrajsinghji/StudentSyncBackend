@@ -6,11 +6,12 @@ const userRoutes = require('./routes/userRoutes');
 const institutionRoutes = require('./routes/institutionRoutes');
 const skillsRoutes = require('./routes/skillRoutes');
 const emailRoutes = require('./routes/emailRoutes');
+const usercontactRoutes = require('./routes/usercontactRoutes');
 
 const app = express();
 
 
-const port = process.env.PORT || 8081;
+const port = process.env.PORT || 8088;
 
 app.use(express.json());
 
@@ -18,6 +19,7 @@ app.use(userRoutes);
 app.use(institutionRoutes);
 app.use(skillsRoutes);
 app.use(emailRoutes);
+app.use(usercontactRoutes);
 
 app.get('/', function (req, res) {
     res.send('This is StudentSync backend');
