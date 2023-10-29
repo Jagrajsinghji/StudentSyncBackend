@@ -40,7 +40,24 @@ exports.createUser = async (req, res) => {
     res.status(400).send(error);
   }
 };
-
+// POST /users/pre
+exports.createPreUser = async (req, res) => {
+    try {
+      const { email } = req.body;
+      const existingUser = await Userdetails.findOne({ $or: [{ email }] });
+  
+      if (existingUser) {
+        return res.status(409).send('Email already exists');
+      }
+  
+      const userdetails = new Userdetails(req.body);
+      userdetails.user_status="0";
+      await userdetails.save();
+      res.status(201).send(userdetails);
+    } catch (error) {
+      res.status(400).send(error);
+    }
+  };
 
 // PATCH /users/:id
 exports.updateUser = async (req, res) => {
