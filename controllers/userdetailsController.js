@@ -1,10 +1,10 @@
-const User = require('../models/users');
+const Userdetails = require('../models/userdetails');
 
 // GET /users
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.find();
-    res.status(200).send(users);
+    const userdetails = await Userdetails.find();
+    res.status(200).send(userdetails);
   } catch (error) {
     res.status(500).send(error);
   }
@@ -13,11 +13,11 @@ exports.getAllUsers = async (req, res) => {
 // GET /users/:id
 exports.getUser = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
-    if (!user) {
+    const userdetails = await Userdetails.findById(req.params.id);
+    if (!userdetails) {
       return res.status(404).send('Username not found');
     }
-    res.send(user);
+    res.send(userdetails);
   } catch (error) {
     res.status(500).send(error);
   }
@@ -27,15 +27,15 @@ exports.getUser = async (req, res) => {
 exports.createUser = async (req, res) => {
   try {
     const { email, name } = req.body;
-    const existingUser = await User.findOne({ $or: [{ email }, { name }] });
+    const existingUser = await Userdetails.findOne({ $or: [{ email }, { name }] });
 
     if (existingUser) {
       return res.status(409).send('Username or email already exists');
     }
 
-    const user = new User(req.body);
-    await user.save();
-    res.status(201).send(user);
+    const userdetails = new Userdetails(req.body);
+    await userdetails.save();
+    res.status(201).send(userdetails);
   } catch (error) {
     res.status(400).send(error);
   }
@@ -51,15 +51,15 @@ exports.updateUser = async (req, res) => {
     return res.status(400).send({ error: 'Invalid updates!' });
   }
   try {
-    const user = await User.findById(req.params.id);
-    if (!user) {
+    const userdetails = await Userdetails.findById(req.params.id);
+    if (!userdetails) {
       return res.status(404).send('Username not found');
     }
-    updates.forEach(update => user[update] = req.body[update]);
+    updates.forEach(update => userdetails[update] = req.body[update]);
     updates.forEach(update => console.log(update.name));
-    console.log(user);
-    await user.save();
-    res.send(user);
+    console.log(userdetails);
+    await userdetails.save();
+    res.send(userdetails);
   } catch (error) {
     res.status(400).send(error);
   }
