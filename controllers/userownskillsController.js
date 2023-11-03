@@ -27,11 +27,11 @@ exports.getAUserOwnSkills = async (req, res) => {
   }
 };
 
-// Post /userownskills/:id
+// Post /userownskills/add/:id
 exports.addAUserOwnSkills = async (req, res) => {
     try {
         const userId = req.params.id;
-        const skillId = req.body.ownskill;
+        const skillId = req.body.ownSkills;
 
         // Check if a userownskills document exists for the given userId
         const userownskills = await Userownskills.findOne({ userId });
@@ -39,13 +39,16 @@ exports.addAUserOwnSkills = async (req, res) => {
         if (userownskills) {
             console.log("user exist !");
             // If userownskills document exists, check if the skillId is already in the ownSkills array
-
+            console.log(skillId);
+            console.log(userownskills);
             if (userownskills.ownSkills.includes(skillId)) {
                 // Skill already exists, return an error
                 return res.status(400).json({ message: 'Skill already exists in userownskills.' });
             } else {
                 // Skill doesn't exist, add it to the ownSkills array
+                console.log(skillId);
                 userownskills.ownSkills.push(skillId);
+                console.log(userownskills);
                 await userownskills.save();
                 res.status(200).json({ message: 'Skill added to userownskills.' });
             }
