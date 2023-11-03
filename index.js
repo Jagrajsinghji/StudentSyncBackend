@@ -6,6 +6,7 @@ const institutionRoutes = require('./routes/institutionRoutes');
 const skillsRoutes = require('./routes/skillRoutes');
 const emailRoutes = require('./routes/emailRoutes');
 const userdetailsRoutes = require('./routes/userdetailsRoutes');
+const userownskillsRoutes = require('./routes/userownskillsRoutes');
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(institutionRoutes);
 app.use(skillsRoutes);
 app.use(emailRoutes);
 app.use(userdetailsRoutes);
+app.use(userownskillsRoutes);
 
 app.get('/', function (req, res) {
     res.send('This is StudentSync backend');
