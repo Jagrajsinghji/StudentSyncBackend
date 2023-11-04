@@ -1,4 +1,5 @@
 const express = require('express');
+const http = require('http');
 const mongoose = require('mongoose');
 require('dotenv').config()
 
@@ -10,7 +11,7 @@ const userownskillsRoutes = require('./routes/userownskillsRoutes');
 const userwantskillsRoutes = require('./routes/userwantskillsRoutes');
 
 const app = express();
-
+const myhttp = http.createServer(app);
 
 const port = process.env.PORT || 8088;
 
@@ -26,6 +27,17 @@ app.use(userwantskillsRoutes);
 app.get('/', function (req, res) {
     res.send('This is StudentSync backend');
 });
+
+//Socket Logic
+const socketio = require('socket.io')(myhttp)
+
+socketio.on("connection", (userSocket) => {
+    //Listen to any event
+    userSocket.on("send_message", (data) => {
+        //Send message to all sockets
+        userSocket.broadcast.emit("receive_message", data)
+    })
+})
 
 //Connect to datatbase
 mongoose.set('strictQuery', false);
