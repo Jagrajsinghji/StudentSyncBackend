@@ -13,7 +13,7 @@ const userwantskillsRoutes = require('./routes/userwantskillsRoutes');
 const app = express();
 const myhttp = http.createServer(app);
 
-const port = process.env.PORT || 8088;
+const port = process.env.PORT || 8089;
 
 app.use(express.json());
 
@@ -29,7 +29,7 @@ app.get('/', function (req, res) {
 });
 
 //Socket Logic
-const socketio = require('socket.io')(myhttp)
+const socketio = require('socket.io')(myhttp);
 
 socketio.on("connection", (userSocket) => {
     //Listen to any event
@@ -51,8 +51,9 @@ const connectDB = async()=> {
   }
 }
 
+
 connectDB().then(() => {
-  app.listen(port, () => {
+  myhttp.listen(port, () => {
     console.log(`Server is up on port ${port}`);
   });
 })
