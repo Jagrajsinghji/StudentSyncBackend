@@ -3,6 +3,7 @@ const router = express.Router();
 const emailController = require('../controllers/emailController');
 
 router.post('/email/send/:id', emailController.sendEmail);
-router.get('/email/verify/:id', emailController.verifyEmail);
+router.post('/email/send/grid', emailController.sendEmailGrid);
+router.get('/email/verify/:encryptedEmail', emailController.verifyEmail);
 
 module.exports = router;
