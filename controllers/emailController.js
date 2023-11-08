@@ -38,7 +38,7 @@ exports.sendEmail = async (req, res) => {
 
           // send mail with defined transport object
           let info = await transporter.sendMail({
-            from: 'foo@sandboxb1e1d44671304f88b610a76dca3f042f.mailgun.org',
+            from: `foo@${domain}`,
             to: `${recepientEmail}`,
             subject: 'StudentSync Verification Email : Action Required',
             html: confirmationEmailHTML,
