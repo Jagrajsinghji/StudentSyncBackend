@@ -4,55 +4,8 @@ const crypto = require('crypto');
 
 require('dotenv').config()
 
-const domain = process.env.Mailgun_Domain;
-const pass = process.env.Mailgun_Pass;
-const recepientEmail = process.env.Mailgun_Recepient;
 
 const secretKey = process.env.SECRETE_KEY;
-
-exports.sendEmail = async (req, res) => {
-
-    // Get the base URL dynamically
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
-
-    const userdetails = await Userdetails.findById(req.params.id);
-    const userId = userdetails.id;
-
-    try{
-        // create reusable transporter object using the default SMTP transport
-        let transporter = nodemailer.createTransport({
-            host: "smtp.mailgun.org",
-            port: 587,
-            auth: {
-              user: `postmaster@${domain}`,
-              pass: `${pass}`,
-            },
-          });
-
-        const confirmationEmailHTML = `
-            Please confirm your email address by clicking the button below.
-            We may need to send you critical information about our service, and it is important that we have an accurate email address.
-            <br><br>
-            <a href="${baseUrl}/email/verify/${userId}" style="background-color: #008CBA; color: #ffffff; padding: 10px 20px; text-decoration: none; display: inline-block; border-radius: 5px;">Confirm Email Address</a><br><br>
-
-            <br><br><br><br>
-            — The StudentSync
-        `;
-
-          // send mail with defined transport object
-          let info = await transporter.sendMail({
-            from: `foo@${domain}`,
-            to: `${recepientEmail}`,
-            subject: 'StudentSync Verification Email : Action Required',
-            html: confirmationEmailHTML,
-          });
-         
-          res.status(299).send("Message sent successfully!",);
-        }catch (error) {
-            res.status(500).send(error);
-        }
-
-}
 
 
 exports.sendEmailGrid = async (req, res) => {
@@ -79,7 +32,7 @@ exports.sendEmailGrid = async (req, res) => {
             pass: process.env.SENDGRID_API_KEY,
           },
         });
-
+       
 
       const confirmationEmailHTML = `
           Please confirm your email address by clicking the button below.
@@ -87,6 +40,7 @@ exports.sendEmailGrid = async (req, res) => {
           <br><br>
           <a href="${baseUrl}/email/verify/${encryptedEmail}" style="background-color: #008CBA; color: #ffffff; padding: 10px 20px; text-decoration: none; display: inline-block; border-radius: 5px;">
           Confirm Email Address</a>
+          ${baseUrl}/email/verify/${encryptedEmail}
           <br><br><br><br>
           — The StudentSync
       `;
@@ -98,11 +52,11 @@ exports.sendEmailGrid = async (req, res) => {
           subject: 'StudentSync Verification Email ',
           html: confirmationEmailHTML,
         });
-       
-        res.status(200).send("Message sent successfully! Encypted email is "+encryptedEmail);
+
+        res.status(299).send("Message sent successfully!",);
       }catch (error) {
-          console.log("Error:", error);
-          res.status(500);
+
+          res.status(500).send(error);
       }
 
 }
@@ -115,13 +69,15 @@ exports.verifyEmail = async (req, res) => {
 
           if (user) {
             // User found 
-             if (!user.user_status) {
+  
+            if (user.user_status) {
+              //user status is false
               user.user_status="1";
               user.save();
               res.status(200).send("Verified Successfully");
             }
             else if(user.user_status) {
-            //   //user status is true
+              //user status is true
                 res.status(200).send("You have already verified.");
             }
           } else {
