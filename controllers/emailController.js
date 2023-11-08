@@ -1,15 +1,17 @@
 const nodemailer = require('nodemailer');
 const Userdetails = require('../models/userdetails');
 
+const domain = process.env.Mailgun_Domain;
+const pass = process.env.Mailgun_Pass;
+const recepientEmail = process.env.Mailgun_Recepient;
+
 exports.sendEmail = async (req, res) => {
 
     // Get the base URL dynamically
     const baseUrl = `${req.protocol}://${req.get('host')}`;
 
     const userdetails = await Userdetails.findById(req.params.id);
-    console.log(userdetails);
     const userId = userdetails.id;
-    console.log(userId);
 
     try{
         // create reusable transporter object using the default SMTP transport
@@ -17,10 +19,11 @@ exports.sendEmail = async (req, res) => {
             host: "smtp.mailgun.org",
             port: 587,
             auth: {
-              user: "postmaster@sandboxb1e1d44671304f88b610a76dca3f042f.mailgun.org",
-              pass: "40de706419f68e3000e2b015cc49465d-8c9e82ec-8509fcc7",
+              user: `postmaster@${domain}`,
+              pass: `${pass}`,
             },
           });
+          console.log(transporter.auth);
          
 
         const confirmationEmailHTML = `
@@ -36,7 +39,7 @@ exports.sendEmail = async (req, res) => {
           // send mail with defined transport object
           let info = await transporter.sendMail({
             from: 'foo@sandboxb1e1d44671304f88b610a76dca3f042f.mailgun.org',
-            to: "aprily.ca2022@gmail.com",
+            to: `${recepientEmail}`,
             subject: 'StudentSync Verification Email : Action Required',
             html: confirmationEmailHTML,
           });
