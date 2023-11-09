@@ -13,7 +13,9 @@ const userdetailsSchema = new Schema({
     country: { type: String},
     mobile_number: { type: String},
     student_id_img_name: String,
-    profile_img_name: String
+    profile_img_name: String,
+    lat: {type: String},
+    long: {type: String}
   }, { timestamps: true });
   
 

@@ -62,7 +62,7 @@ exports.createPreUser = async (req, res) => {
 // PATCH /users/:id
 exports.updateUser = async (req, res) => {
   const updates = Object.keys(req.body);
-  const allowedUpdates = ['name', 'email', 'password', 'user_status','institutionId','city','province','country','mobile_number'];
+  const allowedUpdates = ['name', 'email', 'password', 'user_status','institutionId','city','province','country','mobile_number','lat','long'];
   const isValidOperation = updates.every(update => allowedUpdates.includes(update));
   if (!isValidOperation) {
     return res.status(400).send({ error: 'Invalid updates!' });
