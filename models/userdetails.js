@@ -15,7 +15,8 @@ const userdetailsSchema = new Schema({
     student_id_img_name: String,
     profile_img_name: String,
     lat: {type: String},
-    long: {type: String}
+    long: {type: String},
+    notificationToken: {type: String}
   }, { timestamps: true });
   
 

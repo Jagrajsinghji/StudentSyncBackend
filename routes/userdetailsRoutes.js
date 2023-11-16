@@ -8,4 +8,6 @@ router.post('/users', userdetailsController.createUser);
 router.patch('/users/:id', userdetailsController.updateUser);
 router.post('/users/pre', userdetailsController.createPreUser);
 
+router.post('/users/login', userdetailsController.loginuser);
+
 module.exports = router;
