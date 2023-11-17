@@ -45,3 +45,19 @@ exports.createPost = async(req, res) => {
         res.status(500).send(error);
     }
 }
+
+// GET /posts
+exports.getAllPosts = async (req, res) => {
+    try {
+        const { lat, long, radius } = req.query;
+
+        const posts = await Post.find();
+        if(posts.length==0){
+            return res.status(200).send("There is no posts.");
+        }
+
+        return res.status(200).send(posts);
+    } catch (error) {
+        return res.status(500).send(error);
+    }
+  };
