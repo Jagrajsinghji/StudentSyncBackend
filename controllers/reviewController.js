@@ -22,6 +22,9 @@ exports.reviewUser = async (req, res) => {
         await newReview.save();
         res.status(201).send(newReview);
     } catch (error) {
+        if (error.name === 'CastError') {
+            return res.status(400).send('Invalid format. Check your request Id value. ');
+        }
         res.status(400).send(error);
     }
 }
@@ -43,6 +46,9 @@ exports.getAllReviewsByUser = async (req, res) => {
         res.status(200).json(reviews);
 
     } catch (error) {
+        if (error.name === 'CastError') {
+            return res.status(400).send('Invalid format. Check your request Id value. ');
+        }
         res.status(500).send(error);
     }
 }

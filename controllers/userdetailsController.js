@@ -38,6 +38,9 @@ exports.createUser = async (req, res) => {
     await userdetails.save();
     res.status(201).send(userdetails);
   } catch (error) {
+    if (error.name === 'CastError') {
+        return res.status(400).send('Invalid format. Check your request Id value. ');
+    }
     res.status(400).send(error);
   }
 };
@@ -56,6 +59,9 @@ exports.createPreUser = async (req, res) => {
       await userdetails.save();
       res.status(201).send(userdetails);
     } catch (error) {
+      if (error.name === 'CastError') {
+          return res.status(400).send('Invalid format. Check your request Id value. ');
+      }
       res.status(400).send(error);
     }
   };
