@@ -1,14 +1,12 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const bcrypt = require('bcrypt');
 
 const userownskillsSchema = new Schema({
-    userId: { type: Schema.Types.ObjectId, ref: 'Userdetails', required: true, unique: true },
+    userId: { type: Schema.Types.ObjectId, ref: 'Userdetails', required: true},
     //ownSkills: [{ type: Schema.Types.ObjectId, ref: 'Skill' }],
     ownSkills: [{
       type: Schema.Types.ObjectId,
-      ref: 'Skill',
-      unique: true,
+      ref: 'Skill'
      }],
   }, { timestamps: true });
   

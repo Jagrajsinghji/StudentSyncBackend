@@ -28,77 +28,114 @@ exports.getAUserWantSkills = async (req, res) => {
 };
 
 // Post /userwantskills/add/:id
-exports.addAUserWantSkills = async (req, res) => {
-    try {
-        const userId = req.params.id;
-        const skillIds = req.body.wantSkills;
+// exports.addAUserWantSkills = async (req, res) => {
+//     try {
+//         const userId = req.params.id;
+//         const skillIds = req.body.wantSkills;
 
-        // Check if a userwantskills document exists for the given userId
-        const userwantskills = await Userwantskills.findOne({ userId });
+//         // Check if a userwantskills document exists for the given userId
+//         const userwantskills = await Userwantskills.findOne({ userId });
 
-        if (userwantskills && skillIds && skillIds.length > 0) {
-            // If userwantskills document exists and there is at least one skill in the request payload, 
-            //check if the skillId is already in the wantSkills array
+//         if (userwantskills && skillIds && skillIds.length > 0) {
+//             // If userwantskills document exists and there is at least one skill in the request payload, 
+//             //check if the skillId is already in the wantSkills array
                 
-            // Convert string skillIds to ObjectId instances
-            const objectIdSkills = skillIds.map(skill => skill);
+//             // Convert string skillIds to ObjectId instances
+//             const objectIdSkills = skillIds.map(skill => skill);
 
-            // Check if any of the objectIdSkills are already in wantSkills
-            const skillExists = objectIdSkills.some(skill => userwantskills.wantSkills.includes(skill));
+//             // Check if any of the objectIdSkills are already in wantSkills
+//             const skillExists = objectIdSkills.some(skill => userwantskills.wantSkills.includes(skill));
 
-            if (skillExists) {
-              return res.status(400).json({ message: 'One or more skills are already in userwantskills.' });
-            }
+//             if (skillExists) {
+//               return res.status(400).json({ message: 'One or more skills are already in userwantskills.' });
+//             }
 
-            // All skill doesn't exist, add all skills to the wantSkills array 
-            userwantskills.wantSkills = userwantskills.wantSkills.concat(objectIdSkills);
-            await userwantskills.save();
-            res.status(200).json({ message: 'Skill added to userwantskills.' });
-        } else {
-            // If userwantskills document doesn't exist, create a new one with the provided userId and skill
-            const newUserwantskills = new Userwantskills({
-                userId,
-                wantSkills: [skillIds],
-            });
+//             // All skill doesn't exist, add all skills to the wantSkills array 
+//             userwantskills.wantSkills = userwantskills.wantSkills.concat(objectIdSkills);
+//             await userwantskills.save();
+//             res.status(200).json({ message: 'Skill added to userwantskills.' });
+//         } else {
+//             // If userwantskills document doesn't exist, create a new one with the provided userId and skill
+//             const newUserwantskills = new Userwantskills({
+//                 userId,
+//                 wantSkills: [skillIds],
+//             });
 
-            await newUserwantskills.save();
-            res.status(201).json({ message: 'Userwantskills created with the skill.' });
-        }
-    } catch (error) {
-      if (error.name === 'CastError') {
-        return res.status(400).send('Invalid format. Check your request Id value. ');
-      }
-        res.status(500).send(error);
-    }
-};
+//             await newUserwantskills.save();
+//             res.status(201).json({ message: 'Userwantskills created with the skill.' });
+//         }
+//     } catch (error) {
+//       if (error.name === 'CastError') {
+//         return res.status(400).send('Invalid format. Check your request Id value. ');
+//       }
+//         res.status(500).send(error);
+//     }
+// };
 
-// Delete /userwantskills/remove/:id
-exports.deleteAUserWantSkills = async (req, res) => {
+exports.addAUserWantSkills = async (req, res) => {
   try {
-      const userId = req.params.id;
-      const skillId = req.body.wantSkills;
+    const userId = req.params.id;
+    const wantSkills = req.body.wantSkills;
 
-      // Check if a userwantskills document exists for the given userId
-      const userwantskills = await Userwantskills.findOne({ userId });
+    //check whether user exits
+    const existingUserwantskills = await Userwantskills.findOne({userId});
+    if(!existingUserwantskills){
+      //create new record
+      // Convert string wantSkills to ObjectId instances
+      const objectIdSkills = wantSkills.map(skill => skill);
+      const existingUserwantskills = new Userwantskills({
+          userId,
+          wantSkills: objectIdSkills,
+      });
+      await existingUserwantskills.save();
+      return res.status(200).json({ message: 'Userwantskills created with the skill.' });
+    }
 
-      if (userwantskills) {
-          // If userwantskills document exists, check if the skillId is already in the wantSkills array
-          const skillToRemoveIndex = userwantskills.wantSkills.findIndex(skill => skill.toString() === skillId[0].toString());
+    // Use findOneAndUpdate with the upsert option
+    const result = await Userwantskills.findOneAndUpdate(
+      { userId },
+      { $set: { wantSkills }  },
+      { upsert: true, new: true } // upsert: true enables insert if the document doesn't exist, new: true returns the modified document
+    );
 
-          if(skillToRemoveIndex !== -1){ //exist
-            userwantskills.wantSkills.splice(skillToRemoveIndex, 1);
+    return res.status(201).json({ message: 'Userwantskills updated with the skill.' });
 
-            await userwantskills.save();
-            res.status(200).json({ message: 'Skill removed from userwantskills.' });
-          }
-          else{ //skill not exist
-            return res.status(400).json({ message: 'Skill does not exist in userwantskills.' });
-          }
-          
-      } else {
-          return res.status(400).json({ message: 'User does not exist in userwantskills.' });
-      }
   } catch (error) {
-      res.status(500).send(error);
+    if (error.name === 'CastError') {
+      return res.status(400).send('Invalid format. Check your request Id value. ');
+    }
+    return res.status(500).send(error);
   }
 };
+
+
+// Delete /userwantskills/remove/:id
+// exports.deleteAUserWantSkills = async (req, res) => {
+//   try {
+//       const userId = req.params.id;
+//       const skillId = req.body.wantSkills;
+
+//       // Check if a userwantskills document exists for the given userId
+//       const userwantskills = await Userwantskills.findOne({ userId });
+
+//       if (userwantskills) {
+//           // If userwantskills document exists, check if the skillId is already in the wantSkills array
+//           const skillToRemoveIndex = userwantskills.wantSkills.findIndex(skill => skill.toString() === skillId[0].toString());
+
+//           if(skillToRemoveIndex !== -1){ //exist
+//             userwantskills.wantSkills.splice(skillToRemoveIndex, 1);
+
+//             await userwantskills.save();
+//             res.status(200).json({ message: 'Skill removed from userwantskills.' });
+//           }
+//           else{ //skill not exist
+//             return res.status(400).json({ message: 'Skill does not exist in userwantskills.' });
+//           }
+          
+//       } else {
+//           return res.status(400).json({ message: 'User does not exist in userwantskills.' });
+//       }
+//   } catch (error) {
+//       res.status(500).send(error);
+//   }
+// };

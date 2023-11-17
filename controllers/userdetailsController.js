@@ -1,5 +1,7 @@
 const Userdetails = require('../models/userdetails');
 const bcrypt = require('bcrypt');
+const Userwantskills = require('../models/userwantskills');
+const Userownskills = require('../models/userownskills');
 
 // GET /users
 exports.getAllUsers = async (req, res) => {
@@ -23,6 +25,34 @@ exports.getUser = async (req, res) => {
     res.status(500).send(error);
   }
 };
+
+
+// GET /users/byskill/:id'
+exports.getAllUsersBySkills = async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    // Find the skills that the user wants to learn
+    const userWantskills = await Userwantskills.findOne({ userId }).populate('wantSkills');
+    const wantedSkills = userWantskills.wantSkills.map(skill => skill._id);
+
+    // Find users who have the wanted skills
+    const usersWithSkills = await Userownskills.find({
+      'ownSkills': { $in: wantedSkills },
+      '_id': { $ne: userId } // Exclude the current user from the results
+    }).select('userId');
+
+    const userIds = usersWithSkills.map(user => user.userId.toString());
+
+    const users = await Userdetails.find({ '_id': { $in: userIds } });
+
+    res.status(200).json({ users });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send(error);
+  }
+};
+
 
 // POST /users
 exports.createUser = async (req, res) => {
