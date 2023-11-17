@@ -11,7 +11,7 @@ exports.createPost = async(req, res) => {
         if(!existigUser){
             return res.status(404).send('No user with this userId');
         }
-                
+
         const newpost = new Post({
           userId,
           caption,
@@ -39,6 +39,9 @@ exports.createPost = async(req, res) => {
 
 
     }catch(error){
+        if (error.name === 'CastError') {
+            return res.status(400).send('Invalid format. Check your request Id value. ');
+        }
         res.status(500).send(error);
     }
 }

@@ -41,7 +41,7 @@ exports.createPostLike = async(req, res) => {
 
     }catch(error){
         if (error.name === 'CastError') {
-            return res.status(400).send('Invalid format. Check your request value.');
+            return res.status(400).send('Invalid format. Check your request Id value.');
           }
         res.status(500).send(error);
     }
