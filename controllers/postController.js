@@ -6,6 +6,12 @@ exports.createPost = async(req, res) => {
 
         const { userId, caption, coordinate, postImg, numOfLike } = req.body;
 
+        //make sure userId is correct
+        const existigUser= await Userdetails.findById(userId);
+        if(!existigUser){
+            return res.status(404).send('No user with this userId');
+        }
+                
         const newpost = new Post({
           userId,
           caption,
@@ -15,7 +21,7 @@ exports.createPost = async(req, res) => {
         });
 
         //save post in db
-        //await newpost.save();
+        await newpost.save();
 
         //prepare response data
         const postedUser  = await Userdetails.findById(userId);
