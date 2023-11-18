@@ -12,6 +12,7 @@ const userwantskillsRoutes = require('./routes/userwantskillsRoutes');
 const reviewsRoutes = require('./routes/reviewsRoutes');
 const postRoutes = require('./routes/postRoutes');
 const postlikehistoryRoutes = require('./routes/postlikehistoryRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 
 const app = express();
 const myhttp = http.createServer(app);
@@ -29,6 +30,7 @@ app.use(userwantskillsRoutes);
 app.use(reviewsRoutes);
 app.use(postRoutes);
 app.use(postlikehistoryRoutes);
+app.use(notificationRoutes);
 
 app.get('/', function (req, res) {
     res.send('This is StudentSync backend');
