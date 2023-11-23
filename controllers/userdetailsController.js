@@ -87,12 +87,12 @@ exports.createPreUser = async (req, res) => {
       const userdetails = new Userdetails(req.body);
       userdetails.user_status="0";
       await userdetails.save();
-      res.status(201).send(userdetails);
+      return res.status(201).send(userdetails);
     } catch (error) {
       if (error.name === 'CastError') {
           return res.status(400).send('Invalid format. Check your request Id value. ');
       }
-      res.status(400).send(error);
+      return res.status(400).send(error);
     }
   };
 

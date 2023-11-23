@@ -27,6 +27,7 @@ userdetailsSchema.pre('save', async function(next) {
     const salt = await bcrypt.genSalt(10);
     userdetails.password = await bcrypt.hash(userdetails.password, salt);
   }
+  this.email = this.email.toLowerCase();
   next();
 });
 
