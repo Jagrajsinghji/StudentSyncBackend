@@ -136,7 +136,7 @@ exports.loginuser = async (req, res) => {
         return res.status(401).send('Invalid password');
       }
 
-      res.status(200).send('Login successful');
+      res.status(200).send(existingUser);
 
   } catch (error) {
     res.status(400).send(error);
