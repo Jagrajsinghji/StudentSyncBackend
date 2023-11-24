@@ -6,9 +6,6 @@ exports.uploadProfile =  async(req, res) => {
 
         receiveImage(req, res, async (err) => {
             //handling errors from multer
-            if (err) {
-                return res.json({ error: err.message });
-            }
     
             try {
                 const imageStream = req.file.buffer;
@@ -27,17 +24,14 @@ exports.uploadProfile =  async(req, res) => {
             }
         })
     }catch(error){
-        return res.status(500).send(error);
+        return res.json({ error: 'Failed to upload'+error });
     }
 }
 
 exports.uploadStudentid =  async(req, res) => {
     try{
-        receiveImage(req, res, async (err) => {
+        receiveImage(req, res, async (error) => {
             //handling errors from multer 
-            if (err) {
-                return res.status(500).send({ error: err.message });
-            }
             try {
                 const imageStream = req.file.buffer;
                 const imageName = new Date().getTime().toString();
