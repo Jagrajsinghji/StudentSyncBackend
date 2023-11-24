@@ -20,9 +20,9 @@ exports.getUser = async (req, res) => {
     if (!userdetails) {
       return res.status(404).send('Username not found');
     }
-    res.send(userdetails);
+    return res.send(userdetails);
   } catch (error) {
-    res.status(500).send(error);
+    return res.status(500).send(error);
   }
 };
 
@@ -46,10 +46,9 @@ exports.getAllUsersBySkills = async (req, res) => {
 
     const users = await Userdetails.find({ '_id': { $in: userIds } });
 
-    res.status(200).json({ users });
+    return res.status(200).json({ users });
   } catch (error) {
-    console.error(error);
-    res.status(500).send(error);
+    return res.status(500).json(error);
   }
 };
 
@@ -62,16 +61,17 @@ exports.createUser = async (req, res) => {
 
     if (existingUser) {
       return res.status(409).send('Username or email already exists');
+    }else{
+      const userdetails = new Userdetails(req.body);
+      await userdetails.save();
+      return res.status(201).send(userdetails);
     }
 
-    const userdetails = new Userdetails(req.body);
-    await userdetails.save();
-    res.status(201).send(userdetails);
   } catch (error) {
     if (error.name === 'CastError') {
         return res.status(400).send('Invalid format. Check your request Id value. ');
     }
-    res.status(400).send(error);
+    return res.status(400).send(error);
   }
 };
 // POST /users/pre
@@ -110,8 +110,7 @@ exports.updateUser = async (req, res) => {
       return res.status(404).send('Username not found');
     }
     updates.forEach(update => userdetails[update] = req.body[update]);
-    updates.forEach(update => console.log(update.name));
-    console.log(userdetails);
+    
     await userdetails.save();
     res.send(userdetails);
   } catch (error) {
@@ -127,7 +126,7 @@ exports.loginuser = async (req, res) => {
       const existingUser = await Userdetails.findOne({email});
 
       if(!existingUser){
-        return res.status(404).send('User does not exist!')
+        return res.status(404).send('User does not exist!');
       }
 
       const isPasswordValid = await bcrypt.compare(password, existingUser.password);
@@ -136,9 +135,9 @@ exports.loginuser = async (req, res) => {
         return res.status(401).send('Invalid password');
       }
 
-      res.status(200).send(existingUser);
+      return res.status(200).send(existingUser);
 
   } catch (error) {
-    res.status(400).send(error);
+    return res.status(400).json(error);
   }
 };
