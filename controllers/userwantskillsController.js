@@ -21,9 +21,9 @@ exports.getAUserWantSkills = async (req, res) => {
       wantSkills: userwantskills.wantSkills.map(skill => skill?.name),
     };
 
-    res.send(result);
+    return res.status(200).send(result);
   } catch (error) {
-    res.status(500).send(error);
+    return res.status(500).send(error);
   }
 };
 
