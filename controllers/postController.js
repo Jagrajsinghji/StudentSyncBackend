@@ -61,3 +61,26 @@ exports.getAllPosts = async (req, res) => {
         return res.status(500).send(error);
     }
   };
+
+  // POST /posts/:id
+exports.getAUserPosts = async (req, res) => {
+    try {
+        const {userId} = req.body;
+      
+        //get all data on posts table by userId
+        const posts = await Post.find({ userId });
+
+        // Check if any reviews were found
+        if (posts.length === 0) {
+            return res.status(404).json({ message: "No posts found for this user." });
+        }
+
+        return res.status(200).json(posts);
+
+    } catch (error) {
+        if (error.name === 'CastError') {
+            return res.status(400).send('Invalid format. Check your request Id value. ');
+        }
+        return res.status(500).send(error);
+    }
+  };
