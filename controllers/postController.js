@@ -104,14 +104,32 @@ exports.getAUserPosts = async (req, res) => {
         const {userId} = req.body;
       
         //get all data on posts table by userId
-        const posts = await Post.find({ userId });
+        const posts = await Post.find().populate({
+            path: 'userId',
+            model: 'Userdetails',
+            select: 'name profile_img_name',
+        });
 
         // Check if any reviews were found
         if (posts.length === 0) {
             return res.status(404).json({ message: "No posts found for this user." });
         }
 
-        return res.status(200).json(posts);
+        // Modify the response to include user's name and profile image
+        const modifiedPosts = posts.map(post => ({
+            _id: post._id,
+            userId: post.userId._id,
+            name: post.userId.name,
+            profile_img_name: post.userId.profile_img_name,
+            caption: post.caption,
+            coordinate: post.coordinate,
+            postImg: post.postImg,
+            numOfLike: post.numOfLike,
+            createdAt: post.createdAt,
+            updatedAt: post.updatedAt,
+        }));
+
+        return res.status(200).json(modifiedPosts);
 
     } catch (error) {
         if (error.name === 'CastError') {
