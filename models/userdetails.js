@@ -11,6 +11,7 @@ const userdetailsSchema = new Schema({
     city: { type: String},
     province: { type: String},
     country: { type: String},
+    postal_code: { type: String},
     mobile_number: { type: String},
     student_id_img_name: String,
     profile_img_name: String,
