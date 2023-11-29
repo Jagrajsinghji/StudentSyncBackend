@@ -47,20 +47,56 @@ exports.createPost = async(req, res) => {
 }
 
 // GET /posts
+// GET /posts
 exports.getAllPosts = async (req, res) => {
     try {
         const { lat, long, radius } = req.query;
 
-        const posts = await Post.find();
-        if(posts.length==0){
+        // Use populate to include user details in the posts
+        const posts = await Post.find().populate({
+            path: 'userId',
+            model: 'Userdetails',
+            select: 'name profile_img_name',
+        });
+
+        if (posts.length == 0) {
             return res.status(200).send("There is no posts.");
         }
 
-        return res.status(200).send(posts);
+        // Modify the response to include user's name and profile image
+        const modifiedPosts = posts.map(post => ({
+            _id: post._id,
+            userId: post.userId._id,
+            name: post.userId.name,
+            profile_img_name: post.userId.profile_img_name,
+            caption: post.caption,
+            coordinate: post.coordinate,
+            postImg: post.postImg,
+            numOfLike: post.numOfLike,
+            createdAt: post.createdAt,
+            updatedAt: post.updatedAt,
+        }));
+
+        return res.status(200).send(modifiedPosts);
     } catch (error) {
         return res.status(500).send(error);
     }
-  };
+};
+
+// exports.getAllPosts = async (req, res) => {
+//     try {
+//         const { lat, long, radius } = req.query;
+
+//         const posts = await Post.find();
+//         if(posts.length==0){
+//             return res.status(200).send("There is no posts.");
+//         }
+
+//         return res.status(200).send(posts);
+//     } catch (error) {
+//         return res.status(500).send(error);
+//     }
+//   };
 
   // POST /posts/:id
 exports.getAUserPosts = async (req, res) => {
