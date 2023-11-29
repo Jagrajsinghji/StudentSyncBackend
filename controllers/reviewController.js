@@ -36,14 +36,31 @@ exports.getAllReviewsByUser = async (req, res) => {
         const {user_id} = req.body;
 
         //get all data on reviews table by user_id
-        const reviews = await Review.find({ user_id });
+        const reviews = await Review.find({ user_id })
+        .populate({
+            path: 'reviewer_user_id',
+            model: 'Userdetails',
+            select: 'name profile_img_name',
+        });
 
         // Check if any reviews were found
         if (reviews.length === 0) {
             return res.status(404).json({ message: "No reviews found for the specified user_id." });
         }
+        // Modify the response to include user's name and profile image
+        const modifiedReviews = reviews.map(review => ({
+            _id: review._id,
+            userId: review.user_id._id,
+            rating: review.rating,
+            review_comment: review.review_comment,
+            reviewer_user_id: review.reviewer_user_id._id,
+            reviewe_name: review.reviewer_user_id.name,
+            reviewe_profile_img_name: review.reviewer_user_id.profile_img_name,
+            createdAt: review.createdAt,
+            updatedAt: review.updatedAt,      
+        }))
 
-        res.status(200).json(reviews);
+        res.status(200).json(modifiedReviews);
 
     } catch (error) {
         if (error.name === 'CastError') {
