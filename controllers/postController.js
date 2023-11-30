@@ -104,7 +104,7 @@ exports.getAUserPosts = async (req, res) => {
         const {userId} = req.body;
       
         //get all data on posts table by userId
-        const posts = await Post.find().populate({
+        const posts = await Post.find({ userId }).populate({
             path: 'userId',
             model: 'Userdetails',
             select: 'name profile_img_name',
