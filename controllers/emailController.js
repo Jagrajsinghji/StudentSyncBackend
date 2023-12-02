@@ -40,7 +40,7 @@ exports.sendEmailGrid = async (req, res) => {
           <br><br>
           <a href="${baseUrl}/email/verify/${encryptedEmail}" style="background-color: #008CBA; color: #ffffff; padding: 10px 20px; text-decoration: none; display: inline-block; border-radius: 5px;">
           Confirm Email Address</a>
-          ${baseUrl}/email/verify/${encryptedEmail}
+
           <br><br><br><br>
           — The StudentSync
       `;
