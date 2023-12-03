@@ -15,8 +15,17 @@ const userdetailsSchema = new Schema({
     mobile_number: { type: String},
     student_id_img_name: String,
     profile_img_name: String,
-    lat: {type: String},
-    long: {type: String},
+    location: {
+      type: {
+        type: String, // Don't do `{ location: { type: String } }`
+        enum: ['Point'], // 'location.type' must be 'Point'
+        required: true
+      },
+      coordinates: {
+        type: [Number],
+        required: true
+      }
+    },
     notificationToken: {type: String}
   }, { timestamps: true });
   
@@ -32,6 +41,7 @@ userdetailsSchema.pre('save', async function(next) {
   next();
 });
 
+userdetailsSchema.index({ location: "2dsphere" });
 const Userdetails = mongoose.model('Userdetails', userdetailsSchema);
 
 module.exports = Userdetails;

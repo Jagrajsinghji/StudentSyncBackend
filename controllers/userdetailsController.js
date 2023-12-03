@@ -2,6 +2,8 @@ const Userdetails = require('../models/userdetails');
 const bcrypt = require('bcrypt');
 const Userwantskills = require('../models/userwantskills');
 const Userownskills = require('../models/userownskills');
+const Review = require('../models/reviews');
+const Skills = require('../models/skills');
 
 // GET /users
 exports.getAllUsers = async (req, res) => {
@@ -20,8 +22,15 @@ exports.getUser = async (req, res) => {
     if (!userdetails) {
       return res.status(404).send('Username not found');
     }
-    return res.send(userdetails);
+   
+    const otherInfo = await getAllInfoForUser(req.params.id);
+    const result = {
+      "details": userdetails,
+      ...otherInfo
+    }
+    return res.send(result);
   } catch (error) {
+    console.log(error);
     return res.status(500).send(error);
   }
 };
@@ -46,7 +55,15 @@ exports.getAllUsersBySkills = async (req, res) => {
 
     const users = await Userdetails.find({ '_id': { $in: userIds } });
 
-    return res.status(200).json({ users });
+    const modifiedUsers =  await Promise.all(users.map(async(user)=>{ 
+      const otherInfo = await getAllInfoForUser(user._id);
+      const result = {
+        "details": user,
+        ...otherInfo
+      };
+    return result;
+    }));
+    return res.status(200).json({ users:modifiedUsers });
   } catch (error) {
     return res.status(500).json(error);
   }
@@ -99,7 +116,7 @@ exports.createPreUser = async (req, res) => {
 // PATCH /users/:id
 exports.updateUser = async (req, res) => {
   const updates = Object.keys(req.body);
-  const allowedUpdates = ['name', 'email', 'password', 'user_status','institutionId','city','province','country','postal_code','mobile_number','lat','long','notificationToken','student_id_img_name','profile_img_name'];
+  const allowedUpdates = ['name', 'email', 'password', 'user_status','institutionId','city','province','country','postal_code','mobile_number','notificationToken','student_id_img_name','profile_img_name','location'];
   const isValidOperation = updates.every(update => allowedUpdates.includes(update));
   if (!isValidOperation) {
     return res.status(400).send({ error: 'Invalid updates!' });
@@ -141,3 +158,38 @@ exports.loginuser = async (req, res) => {
     return res.status(400).send(error);
   }
 };
+
+getAllInfoForUser = async (userId)=>{
+
+  const userownskills = await Userownskills.findOne({userId})
+  .populate({ path: 'ownSkills', model: Skills, select: 'name' })
+  .exec();
+  
+const userwantskills = await Userwantskills.findOne({userId})
+  .populate({ path: 'wantSkills', model: Skills, select: 'name' })
+  .exec();
+
+  const reviews = await Review.find({user_id:userId})
+    .populate({
+        path: 'reviewer_user_id',
+        model: 'Userdetails',
+        select: 'name profile_img_name',
+    });
+    const modifiedReviews = reviews.map(review => ({
+      _id: review._id,
+      userId: review.user_id._id,
+      rating: review.rating,
+      review_comment: review.review_comment,
+      reviewer_user_id: review.reviewer_user_id._id,
+      reviewe_name: review.reviewer_user_id.name,
+      reviewe_profile_img_name: review.reviewer_user_id.profile_img_name,
+      createdAt: review.createdAt,
+      updatedAt: review.updatedAt,      
+  }))
+
+  return {
+    "ownSkills": userownskills.ownSkills,
+    "wantSkills":userwantskills.wantSkills,
+    "reviews": modifiedReviews
+  };
+}
