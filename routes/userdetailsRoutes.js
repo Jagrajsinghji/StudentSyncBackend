@@ -10,7 +10,7 @@ router.post('/users/pre', userdetailsController.createPreUser);
 
 router.post('/users/login', userdetailsController.loginuser);
 
-router.get('/users/byskill/:id', userdetailsController.getAllUsersBySkills);
+router.post('/users/nearbyBasedOnUserSkills', userdetailsController.getNearbyUsersBasedOnUserSkills);
 
 
 module.exports = router;
