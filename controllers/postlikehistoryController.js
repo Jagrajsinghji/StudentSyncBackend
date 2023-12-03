@@ -22,7 +22,12 @@ exports.createPostLike = async(req, res) => {
         //check user already like this post
         const existigPostlikehistory = await postlikehistory.findOne({ $or: [{ userId, postId }] });
         if(existigPostlikehistory){
-            return res.status(409).send('This user already like the post!');
+            existigPostlikehistory.remove();
+            //remove 1 in numOfLike in post collection
+            existigpost.numOfLike -= 1;
+            await existigpost.save();
+            res.send({message:"User unliked the post", isLiked:false});
+            return;
         }
 
         const postlike = new postlikehistory({
@@ -37,7 +42,7 @@ exports.createPostLike = async(req, res) => {
         existigpost.numOfLike += 1;
         await existigpost.save();
 
-        res.sendStatus(201);
+        res.send({message:"User liked the post",isLiked:true});
 
     }catch(error){
         if (error.name === 'CastError') {

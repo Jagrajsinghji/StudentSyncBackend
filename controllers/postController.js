@@ -1,30 +1,33 @@
 const Post = require('../models/posts');
 const Userdetails = require('../models/userdetails');
 
-exports.createPost = async(req, res) => {
-    try{
+exports.createPost = async (req, res) => {
+    try {
 
-        const { userId, caption, coordinate, postImg, numOfLike } = req.body;
+        const { userId, caption, coordinate, postImg } = req.body;
 
         //make sure userId is correct
-        const existigUser= await Userdetails.findById(userId);
-        if(!existigUser){
+        const existigUser = await Userdetails.findById(userId);
+        if (!existigUser) {
             return res.status(404).send('No user with this userId');
         }
 
         const newpost = new Post({
-          userId,
-          caption,
-          coordinate,
-          postImg,
-          numOfLike
+            userId,
+            caption,
+            location: {
+                type: "Point",
+                coordinates: coordinate
+            },
+            postImg,
+            numOfLike: 0
         });
 
         //save post in db
         await newpost.save();
 
         //prepare response data
-        const postedUser  = await Userdetails.findById(userId);
+        const postedUser = await Userdetails.findById(userId);
 
         const reponseData = {
             userId: userId,
@@ -33,12 +36,10 @@ exports.createPost = async(req, res) => {
             newpost: newpost
         }
 
-
-
         res.status(201).send(reponseData);
 
 
-    }catch(error){
+    } catch (error) {
         if (error.name === 'CastError') {
             return res.status(400).send('Invalid format. Check your request Id value. ');
         }
@@ -50,7 +51,6 @@ exports.createPost = async(req, res) => {
 // GET /posts
 exports.getAllPosts = async (req, res) => {
     try {
-        const { lat, long, radius } = req.query;
 
         // Use populate to include user details in the posts
         const posts = await Post.find().populate({
@@ -70,7 +70,8 @@ exports.getAllPosts = async (req, res) => {
             name: post.userId.name,
             profile_img_name: post.userId.profile_img_name,
             caption: post.caption,
-            coordinate: post.coordinate,
+            coordinate: post.location.coordinates,
+            locationName: post.locationName,
             postImg: post.postImg,
             numOfLike: post.numOfLike,
             createdAt: post.createdAt,
@@ -98,11 +99,10 @@ exports.getAllPosts = async (req, res) => {
 //     }
 //   };
 
-  // POST /posts/:id
-exports.getAUserPosts = async (req, res) => {
+// GET /postsById/?id
+exports.getAllPostByUserId = async (req, res) => {
     try {
-        const {userId} = req.body;
-      
+        const userId = req.query.userId;
         //get all data on posts table by userId
         const posts = await Post.find({ userId }).populate({
             path: 'userId',
@@ -110,7 +110,7 @@ exports.getAUserPosts = async (req, res) => {
             select: 'name profile_img_name',
         });
 
-        // Check if any reviews were found
+        // Check if any posts were found
         if (posts.length === 0) {
             return res.status(404).json({ message: "No posts found for this user." });
         }
@@ -122,7 +122,8 @@ exports.getAUserPosts = async (req, res) => {
             name: post.userId.name,
             profile_img_name: post.userId.profile_img_name,
             caption: post.caption,
-            coordinate: post.coordinate,
+            coordinate: post.location.coordinates,
+            locationName: post.locationName,
             postImg: post.postImg,
             numOfLike: post.numOfLike,
             createdAt: post.createdAt,
@@ -137,4 +138,51 @@ exports.getAUserPosts = async (req, res) => {
         }
         return res.status(500).send(error);
     }
-  };
+};
+
+// POST /nearbyPosts
+exports.getAllNearbyPosts = async (req, res) => {
+    try {
+        const { lat, long, radiusInMeters } = req.body;
+
+        // Use populate to include user details in the posts
+        const posts = await Post.find({
+            'location': {
+                $near: {
+                    $geometry: {
+                        type: "Point",
+                        coordinates: [lat, long]
+                    },
+                    $maxDistance: radiusInMeters
+                }
+            }
+        }).populate({
+            path: 'userId',
+            model: 'Userdetails',
+            select: 'name profile_img_name',
+        });
+
+        if (posts.length == 0) {
+            return res.status(200).send({ message: "There are no posts." });
+        }
+
+        // Modify the response to include user's name and profile image
+        const modifiedPosts = posts.map(post => ({
+            _id: post._id,
+            userId: post.userId._id,
+            name: post.userId.name,
+            profile_img_name: post.userId.profile_img_name,
+            caption: post.caption,
+            coordinate: post.location.coordinates,
+            locationName: post.locationName,
+            postImg: post.postImg,
+            numOfLike: post.numOfLike,
+            createdAt: post.createdAt,
+            updatedAt: post.updatedAt,
+        }));
+
+        return res.status(200).send(modifiedPosts);
+    } catch (error) {
+        return res.status(500).send(error);
+    }
+};
