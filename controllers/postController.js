@@ -163,7 +163,7 @@ exports.getAllNearbyPosts = async (req, res) => {
         });
 
         if (posts.length == 0) {
-            return res.status(200).send({ message: "There are no posts." });
+            return res.status(404).send({ message: "There are no posts." });
         }
 
         // Modify the response to include user's name and profile image
