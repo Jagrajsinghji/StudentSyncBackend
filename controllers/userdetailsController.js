@@ -62,7 +62,7 @@ exports.getNearbyUsersBasedOnUserSkills = async (req, res) => {
         $near: {
           $geometry: {
             type: "Point",
-            coordinates: [lat, long]
+            coordinates: [long,lat]
           },
           $maxDistance: radiusInMeters
         }
@@ -150,6 +150,7 @@ exports.updateUser = async (req, res) => {
     await userdetails.save();
     res.send(userdetails);
   } catch (error) {
+    console.log(error);
     res.status(400).send(error);
   }
 };

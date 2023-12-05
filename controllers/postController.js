@@ -151,7 +151,7 @@ exports.getAllNearbyPosts = async (req, res) => {
                 $near: {
                     $geometry: {
                         type: "Point",
-                        coordinates: [lat, long]
+                        coordinates: [long,lat]
                     },
                     $maxDistance: radiusInMeters
                 }
@@ -183,6 +183,7 @@ exports.getAllNearbyPosts = async (req, res) => {
 
         return res.status(200).send(modifiedPosts);
     } catch (error) {
+        console.log(error);
         return res.status(500).send(error);
     }
 };
