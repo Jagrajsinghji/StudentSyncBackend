@@ -4,7 +4,7 @@ const Userdetails = require('../models/userdetails');
 exports.createPost = async (req, res) => {
     try {
 
-        const { userId, caption, coordinate, postImg } = req.body;
+        const { locationName,userId, caption, coordinate, postImg } = req.body;
 
         //make sure userId is correct
         const existigUser = await Userdetails.findById(userId);
@@ -19,6 +19,7 @@ exports.createPost = async (req, res) => {
                 type: "Point",
                 coordinates: coordinate
             },
+            locationName,
             postImg,
             numOfLike: 0
         });
