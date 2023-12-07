@@ -58,15 +58,16 @@ exports.getNearbyUsersBasedOnUserSkills = async (req, res) => {
     const userIds = usersWithSkills.map(user => user.userId.toString());
 
     const users = await Userdetails.find({
-      '_id': { $in: userIds }, 'location': {
-        $near: {
-          $geometry: {
-            type: "Point",
-            coordinates: [long,lat]
-          },
-          $maxDistance: radiusInMeters
-        }
-      }
+      '_id': { $in: userIds },
+      //  'location': {
+      //   $near: {
+      //     $geometry: {
+      //       type: "Point",
+      //       coordinates: [long,lat]
+      //     },
+      //     $maxDistance: radiusInMeters
+      //   }
+      // }
     });
 
     if (users.length === 0) {
