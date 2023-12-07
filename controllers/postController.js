@@ -148,15 +148,15 @@ exports.getAllNearbyPosts = async (req, res) => {
 
         // Use populate to include user details in the posts
         const posts = await Post.find({
-            'location': {
-                $near: {
-                    $geometry: {
-                        type: "Point",
-                        coordinates: [long,lat]
-                    },
-                    $maxDistance: radiusInMeters
-                }
-            }
+            // 'location': {
+            //     $near: {
+            //         $geometry: {
+            //             type: "Point",
+            //             coordinates: [long,lat]
+            //         },
+            //         $maxDistance: radiusInMeters
+            //     }
+            // }
         }).populate({
             path: 'userId',
             model: 'Userdetails',
