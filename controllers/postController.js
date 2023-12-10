@@ -4,7 +4,7 @@ const Userdetails = require('../models/userdetails');
 exports.createPost = async (req, res) => {
     try {
 
-        const { locationName,userId, caption, coordinate, postImg } = req.body;
+        const { locationName,userId, caption, lat,long, postImg } = req.body;
 
         //make sure userId is correct
         const existigUser = await Userdetails.findById(userId);
@@ -17,7 +17,7 @@ exports.createPost = async (req, res) => {
             caption,
             location: {
                 type: "Point",
-                coordinates: coordinate
+                coordinates: [long,lat]
             },
             locationName,
             postImg,
@@ -148,15 +148,15 @@ exports.getAllNearbyPosts = async (req, res) => {
 
         // Use populate to include user details in the posts
         const posts = await Post.find({
-            // 'location': {
-            //     $near: {
-            //         $geometry: {
-            //             type: "Point",
-            //             coordinates: [long,lat]
-            //         },
-            //         $maxDistance: radiusInMeters
-            //     }
-            // }
+            'location': {
+                $near: {
+                    $geometry: {
+                        type: "Point",
+                        coordinates: [long,lat]
+                    },
+                    $maxDistance: radiusInMeters
+                }
+            }
         }).populate({
             path: 'userId',
             model: 'Userdetails',
